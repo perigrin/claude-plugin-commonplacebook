@@ -160,13 +160,13 @@ mkdir ~/notebook
 cd ~/notebook
 zk init
 
-# Install plugin
-cd ~/.claude/plugins
-git clone <this-repo> commonplacebook
+# Install plugin via marketplace (in Claude Code)
+#   /plugin marketplace add perigrin/claude-plugins-marketplace
+#   /plugin install commonplacebook@perigrin-marketplace
 
-# Run setup
-cd ~/notebook
+# Run setup and install wrapper
 ~/.claude/plugins/commonplacebook/scripts/setup.sh
+~/.claude/plugins/commonplacebook/scripts/install-wrapper.sh
 
 # Add aliases to .zk/config.toml (from setup output)
 
