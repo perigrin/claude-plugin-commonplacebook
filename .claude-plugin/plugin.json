@@ -1,0 +1,12 @@
+{
+  "name": "commonplacebook",
+  "version": "0.1.0",
+  "description": "Semantic search and journaling for zk notebooks",
+  "author": {
+    "name": "Chris Prather",
+    "url": "https://chris.prather.org"
+  },
+  "repository": "https://github.com/perigrin/claude-plugin-commonplacebook",
+  "license": "MIT",
+  "keywords": ["zk", "zettelkasten", "semantic-search", "journal"]
+}
