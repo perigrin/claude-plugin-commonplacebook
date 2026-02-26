@@ -1,0 +1,16 @@
+# Commonplace Book Plugin - zk aliases
+# Add this to your .zk/config.toml [alias] section
+
+[alias]
+# Semantic search - finds conceptually related notes
+search = "PLUGIN_ROOT/bin/zk-search semantic"
+
+# Keyword search - full-text search across note content
+keyword = "PLUGIN_ROOT/bin/zk-search keyword"
+ksearch = "PLUGIN_ROOT/bin/zk-search keyword"
+
+# Related notes - find similar notes to a given file
+related = "PLUGIN_ROOT/bin/zk-search similar"
+
+# Lucky - semantic search returning only the best match path
+lucky = "PLUGIN_ROOT/bin/zk-search semantic --limit 1 --paths"
