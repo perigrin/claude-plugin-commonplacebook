@@ -210,14 +210,19 @@ EOF
 }
 
 print_config_snippet() {
+    local wrapper_dir="${ZK_SEARCH_BIN_DIR:-${XDG_BIN_HOME:-$HOME/.local/bin}}"
     echo ""
     echo "=============================="
     echo "Configuration"
     echo "=============================="
     echo ""
-    echo "Add the following to your .zk/config.toml:"
+    echo "1. Install the zk-search wrapper:"
     echo ""
-    cat "$PLUGIN_ROOT/scripts/zk-config-snippet.toml" | sed "s|PLUGIN_ROOT|$PLUGIN_ROOT|g"
+    echo "   $PLUGIN_ROOT/scripts/install-wrapper.sh"
+    echo ""
+    echo "2. Add the following to your .zk/config.toml:"
+    echo ""
+    cat "$PLUGIN_ROOT/scripts/zk-config-snippet.toml" | sed "s|ZK_SEARCH_BIN|$wrapper_dir|g"
 }
 
 main() {
