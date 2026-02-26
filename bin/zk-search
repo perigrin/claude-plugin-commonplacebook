@@ -1,0 +1,183 @@
+#!/usr/bin/env perl
+# ABOUTME: CLI tool for searching notes in notebook.db
+# ABOUTME: Supports keyword (FTS), semantic (vector), and similar note searches
+
+use 5.034;
+use warnings;
+use experimental qw(signatures try);
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Getopt::Long;
+use JSON::PP;
+use Pod::Usage;
+use Commonplacebook::Config;
+use Commonplacebook::Database;
+
+my $db_path;
+my $limit = 10;
+my $json_output = 0;
+my $paths_only = 0;
+
+my $help = 0;
+Getopt::Long::Configure('pass_through');
+GetOptions(
+    'db=s'    => \$db_path,
+    'limit=i' => \$limit,
+    'json'    => \$json_output,
+    'paths'   => \$paths_only,
+    'help|h'  => \$help,
+) or pod2usage(2);
+
+pod2usage(-verbose => 2) if $help;
+
+my $command = shift @ARGV // 'help';
+my $query = join(' ', @ARGV);
+
+sub format_results {
+    my ($results, $type) = @_;
+    if ($paths_only) { say $_->{path} for @$results; return; }
+    if ($json_output) { say encode_json($results); return; }
+    if (@$results == 0) { say "No results found."; return; }
+    for my $i (0 .. $#$results) {
+        my $r = $results->[$i];
+        my $num = $i + 1;
+        say "$num. $r->{title}";
+        say "   Path: $r->{path}";
+        if (defined $r->{similarity}) {
+            my $pct = sprintf("%.1f%%", $r->{similarity} * 100);
+            say "   Similarity: $pct";
+        }
+        if (defined $r->{snippet}) {
+            my $snippet = $r->{snippet};
+            $snippet =~ s/<\/?b>//g;
+            $snippet =~ s/\s+/ /g;
+            say "   Snippet: $snippet";
+        } elsif (defined $r->{chunk_text}) {
+            my $chunk = substr($r->{chunk_text}, 0, 100);
+            $chunk =~ s/\s+/ /g;
+            say "   Chunk: $chunk...";
+        }
+        say "";
+    }
+}
+
+if ($command eq 'help') { pod2usage(-verbose => 2); }
+unless ($query) { die "Error: Query required for '$command' command\n"; }
+
+my %config_args;
+$config_args{db_path} = $db_path if defined $db_path;
+my $config = Commonplacebook::Config->new(%config_args);
+
+my $resolved_db_path = $config->db_path;
+die "Database not found: $resolved_db_path\n" unless -f $resolved_db_path;
+
+my $db = Commonplacebook::Database->new(config => $config);
+
+try {
+    if ($command eq 'keyword' || $command eq 'k') {
+        my $results = $db->search($query, $limit);
+        format_results($results, 'keyword');
+    }
+    elsif ($command eq 'semantic' || $command eq 's') {
+        my $results = $db->semantic_search($query, $limit);
+        format_results($results, 'semantic');
+    }
+    elsif ($command eq 'similar' || $command eq 'r') {
+        my $results = $db->find_similar_notes($query, $limit);
+        format_results($results, 'similar');
+    }
+    else { die "Unknown command: $command\n"; }
+}
+catch ($e) { die "Error: $e\n"; }
+
+$db->disconnect;
+
+__END__
+
+=head1 NAME
+
+zk-search - Search notes in a zk notebook database
+
+=head1 SYNOPSIS
+
+zk-search [options] COMMAND QUERY
+
+=head1 DESCRIPTION
+
+Search notes using keyword (FTS), semantic (vector), or similar note matching.
+
+=head1 COMMANDS
+
+=over 4
+
+=item B<keyword>, B<k>
+
+Full-text search using SQLite FTS5.
+
+=item B<semantic>, B<s>
+
+Semantic search using embeddings and cosine similarity.
+
+=item B<similar>, B<r>
+
+Find notes similar to the given note path.
+
+=item B<help>
+
+Show this help message.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--db>=PATH
+
+Path to notebook.db (default: auto-discovered from .zk/notebook.db)
+
+=item B<--limit>=N
+
+Maximum number of results (default: 10)
+
+=item B<--json>
+
+Output results as JSON
+
+=item B<--paths>
+
+Output only file paths (one per line)
+
+=item B<--help>, B<-h>
+
+Show this help message
+
+=back
+
+=head1 EXAMPLES
+
+    # Keyword search
+    zk-search keyword "semantic search"
+    zk-search k "embedding"
+
+    # Semantic search
+    zk-search semantic "knowledge management"
+    zk-search s "note taking systems"
+
+    # Find similar notes
+    zk-search similar pages/commonplacebook-system.md
+    zk-search r references/tweet-123.md
+
+    # JSON output
+    zk-search --json semantic "zettelkasten"
+
+    # Paths only
+    zk-search --paths keyword "perl"
+
+=head1 AUTHOR
+
+Chris Prather
+
+=cut
