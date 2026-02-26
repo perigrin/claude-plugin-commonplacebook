@@ -63,17 +63,25 @@ The setup script will:
 - Create the `embeddings` table in `.zk/notebook.db` if needed
 - Print a configuration snippet to add to your `.zk/config.toml`
 
-2. Add the printed aliases to your `.zk/config.toml`:
+2. Install the `zk-search` wrapper to a stable location:
+
+```bash
+~/.claude/plugins/commonplacebook/scripts/install-wrapper.sh
+```
+
+This creates a wrapper at `~/.local/bin/zk-search` that discovers the current plugin path dynamically. Override the install location with `ZK_SEARCH_BIN_DIR` or `XDG_BIN_HOME` environment variables.
+
+3. Add the aliases to your `.zk/config.toml`:
 
 ```toml
 [alias]
-search = "/path/to/plugin/bin/zk-search semantic"
-keyword = "/path/to/plugin/bin/zk-search keyword"
-related = "/path/to/plugin/bin/zk-search similar"
-lucky = "/path/to/plugin/bin/zk-search semantic --limit 1 --paths"
+search = "$HOME/.local/bin/zk-search semantic"
+keyword = "$HOME/.local/bin/zk-search keyword"
+related = "$HOME/.local/bin/zk-search similar"
+lucky = "$HOME/.local/bin/zk-search semantic --limit 1 --paths"
 ```
 
-5. Generate embeddings for your existing notes:
+4. Generate embeddings for your existing notes:
 
 ```bash
 cd ~/your-notebook
