@@ -26,14 +26,32 @@ cpanm DBI DBD::SQLite
 
 ## Installation
 
+### Via Marketplace (Recommended)
+
+1. Add the marketplace to Claude Code:
+
+```
+/plugin marketplace add perigrin/claude-plugins-marketplace
+```
+
+2. Install the plugin:
+
+```
+/plugin install commonplacebook@perigrin-marketplace
+```
+
+### Manual Installation
+
 1. Clone the repository to your plugins directory:
 
 ```bash
-cd ~/.claude/plugins  # or wherever Claude Code stores plugins
-git clone https://github.com/yourusername/claude-plugin-commonplacebook.git commonplacebook
+cd ~/.claude/plugins
+git clone https://github.com/perigrin/claude-plugin-commonplacebook.git commonplacebook
 ```
 
-2. Run the setup script from your zk notebook directory:
+### Post-Install Setup
+
+1. Run the setup script from your zk notebook directory:
 
 ```bash
 cd ~/your-notebook
@@ -45,7 +63,7 @@ The setup script will:
 - Create the `embeddings` table in `.zk/notebook.db` if needed
 - Print a configuration snippet to add to your `.zk/config.toml`
 
-3. Add the printed aliases to your `.zk/config.toml`:
+2. Add the printed aliases to your `.zk/config.toml`:
 
 ```toml
 [alias]
@@ -54,8 +72,6 @@ keyword = "/path/to/plugin/bin/zk-search keyword"
 related = "/path/to/plugin/bin/zk-search similar"
 lucky = "/path/to/plugin/bin/zk-search semantic --limit 1 --paths"
 ```
-
-4. Enable the plugin in Claude Code (method depends on your Claude Code configuration).
 
 5. Generate embeddings for your existing notes:
 
