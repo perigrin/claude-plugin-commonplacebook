@@ -22,7 +22,7 @@ Always surface relevant knowledge base context before responding. Notes may cont
 ## Commands
 
 - `/index` - Force re-index the notebook (runs `zk index --force`)
-- `/journal` - Interview about the day and create a journal entry (requires journal module)
+- `/journal` - Interview about the day and create a journal entry
 
 ## Database Schema
 
@@ -33,35 +33,35 @@ The `.zk/notebook.db` SQLite database contains:
 - `notes_collections` - Many-to-many relationship between notes and tags
 - `embeddings` - 384-dimensional vectors for semantic search (note_id, model, embedding BLOB, created_at)
 
-## Optional Modules
+## Journal
 
-### Journal Module
+The `/journal` command interviews the user about their day and creates a journal entry.
 
-See `modules/journal/MODULE.md` for details.
+Context sources (all optional, gracefully skipped if unavailable):
+- **Git activity** - scans local repositories for recent commits
+- **Calendar events** - if icalBuddy is installed (macOS)
+- **Reminders** - if macOS Reminders.app is accessible
+- **Recent photos** - if macOS Photos.app is accessible
+- **Claude conversation history** - if episodic-memory plugin is available
 
-The `/journal` command gathers context from:
-- Git activity across local repositories
-- Calendar events (if icalBuddy is installed)
-- Reminders (if macOS Reminders.app is accessible)
-- Recent photos (if macOS Photos.app is accessible)
-- Claude conversation history (if episodic-memory plugin is available)
+Journal entries are saved to `journals/YYYY-MM-DD.md` with title, date, activity context, summary, key notes, and connections to related notes. After creation, the command re-indexes the notebook, creates a git commit, and offers to create backlinks or stub pages for new concepts.
 
-Journal entries are saved to `journals/YYYY-MM-DD.md` and automatically indexed.
+## macOS Skills
 
-### macOS Module
+Skills for interacting with macOS applications via AppleScript:
+- `calendar` - View and manage Calendar.app events (uses icalBuddy for reading, AppleScript for writing)
+- `reminders` - View and manage Reminders.app items (priorities, due dates, notes)
+- `photos` - View and search Photos.app library (albums, favorites, date ranges)
 
-See `modules/macos/MODULE.md` for details.
-
-Provides skills for interacting with macOS applications:
-- `calendar` - View and manage Calendar.app events
-- `reminders` - View and manage Reminders.app items
-- `photos` - View and search Photos.app library
-
-All macOS features are conditional and gracefully skip when unavailable.
+Requirements:
+- macOS system
+- icalBuddy (for calendar skill) - optional but recommended
+- Calendar.app, Reminders.app, Photos.app must be accessible
+- First-run may prompt for permissions; operations sync with iCloud if enabled
 
 ## Technical Notes
 
 - Embeddings use `sentence-transformers/all-MiniLM-L6-v2` (384-dim, local inference)
 - Search uses cosine similarity with configurable threshold (default 0.5)
 - Scripts require Perl 5.34+ and uv for Python dependency management
-- All modules follow zero non-essential CPAN dependencies policy
+- Zero non-essential CPAN dependencies policy

@@ -93,7 +93,7 @@ This only needs to be run once initially, then periodically when you add new not
 ## Commands
 
 - `/index` - Force re-index the notebook with `zk index --force`
-- `/journal` - Create a journal entry (requires journal module enabled)
+- `/journal` - Create a journal entry
 
 ## Search Usage
 
@@ -124,28 +124,20 @@ Claude will automatically use these commands when searching your knowledge base 
 
 The embedding model (`all-MiniLM-L6-v2`) runs locally via uv, requiring no external API calls.
 
-## Modules
+## Journal
 
-The plugin includes optional modules that can be enabled/disabled independently:
+The `/journal` command interviews you about your day and creates a structured journal entry. Context sources (all optional, gracefully skipped if unavailable):
 
-### Journal Module
-
-Enables the `/journal` command. See `modules/journal/MODULE.md` for details.
-
-Context sources:
 - Git commits across local repositories
 - Calendar events (via icalBuddy on macOS)
 - Reminders (via Reminders.app on macOS)
 - Recent photos (via Photos.app on macOS)
 - Claude conversation history (via episodic-memory plugin)
 
-All context sources are optional and gracefully skipped if unavailable.
+## macOS Skills
 
-### macOS Module
+Skills for interacting with macOS applications:
 
-Provides skills for macOS applications. See `modules/macos/MODULE.md` for details.
-
-Skills:
 - `calendar` - View and manage Calendar.app
 - `reminders` - View and manage Reminders.app
 - `photos` - View and search Photos.app
