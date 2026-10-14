@@ -71,6 +71,37 @@ Before asking questions, gather context:
 
 8. **Review any open PRs or issues** they might have worked on
 
+9. **Fetch today's fediverse posts** (if `FEDIVERSE_ACCT=user@host` is set in
+   `~/.config/commonplacebook/journal.conf`). Originals only — no replies or boosts.
+   Days are local time, so a late-evening post lands on the day it was written:
+   ```bash
+   CONF="$HOME/.config/commonplacebook/journal.conf"
+   DAY=$(date +%Y-%m-%d)
+   if [[ -f "$CONF" ]] && source "$CONF" && [[ -n "${FEDIVERSE_ACCT:-}" ]]; then
+     host=${FEDIVERSE_ACCT#*@}; user=${FEDIVERSE_ACCT%@*}
+     id=$(curl -s "https://$host/api/v1/accounts/lookup?acct=$user" | jq -r .id)
+     # shortcut: one page of 40 posts, enough for a day unless you post 40+ times
+     curl -s "https://$host/api/v1/accounts/$id/statuses?limit=40&exclude_replies=true&exclude_reblogs=true" |
+       jq -r --arg day "$DAY" '.[]
+         | (.created_at | sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601 | localtime) as $t
+         | select(($t | strftime("%Y-%m-%d")) == $day)
+         | "--- \($t | strftime("%H:%M")) \(.url)\(if .spoiler_text != "" then " CW: \(.spoiler_text)" else "" end)\n\(.content)\(.media_attachments | map("\n[\(.type): \(.description // "no alt text")]") | join(""))"'
+   fi
+   ```
+   Post content is HTML; convert it to markdown when writing the entry.
+
+10. **Check today's listening** (if the Spotify collector from the notebook's
+    `bin/spotify-recent.sh` is running):
+    ```bash
+    LOG="${SPOTIFY_RECENT_OUT:-$HOME/.local/share/commonplacebook/listening}/$(date -u +%Y-%m).jsonl"
+    if [[ -f "$LOG" ]]; then
+      jq -r --arg day "$(date +%Y-%m-%d)" '
+        (.played_at | sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601 | localtime) as $t
+        | select(($t | strftime("%Y-%m-%d")) == $day)
+        | "\($t | strftime("%H:%M"))  \(.artist) — \(.track)"' "$LOG" | sort
+    fi
+    ```
+
 ## Contextual Interview
 
 Based on the analysis, tailor questions:
@@ -91,6 +122,13 @@ Based on the analysis, tailor questions:
 - "I see we were working on [project/topic] recently. How's that going?"
 - "Any breakthroughs or blockers on [topic]?"
 - "Want to capture any insights from that work?"
+
+### If fediverse posts found:
+- Don't ask them to repeat what they already posted; ask what's behind it.
+- "You posted about [topic]. Anything you didn't say there?"
+
+### If listening history found:
+- "You had [artist/album] on a lot today. What was the mood?"
 
 ### If it's a workday (Mon-Fri) and no project activity detected:
 - "How was work today?"
@@ -117,7 +155,8 @@ Keep it conversational. Follow the thread of what they want to talk about.
 
 ## After the Interview
 
-Create a journal entry at `journals/YYYY-MM-DD.md` with:
+Create a journal entry at `journals/YYYY_MM_DD.md` (underscores) with the
+template below. If that file already exists, add to it rather than replacing it.
 
 ```markdown
 ---
@@ -136,6 +175,15 @@ tags: ["journal"]
 ## Notes
 
 [Key points, insights, ideas worth remembering]
+
+## Posted
+
+[Today's fediverse posts, verbatim as blockquotes, each with its time, link,
+content warning, and image alt text. Omit the section if there were none.]
+
+## Listening
+
+[A line or two on what was playing, not the full track list. Omit if none.]
 
 ## Connections
 
