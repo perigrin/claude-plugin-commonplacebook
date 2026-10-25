@@ -41,4 +41,4 @@ The tool-specific config file (e.g. `CLAUDE.md`) becomes a thin pointer: in Milo
 
 ## Troubleshooting: reindex / embedding sync
 
-The commonplacebook plugin's index and embed-sync tools are Perl and require `DBI` and `DBD::SQLite`. If they fail with "Can't locate DBI.pm", the Perl selected for the project (e.g. via a plenv `.perl-version`) lacks those modules. Either install them into that Perl (`cpanm DBI DBD::SQLite`) or point the project at a Perl that has them (often system Perl) by setting `.perl-version` accordingly. Verify with `perl -MDBI -MDBD::SQLite -e1` under the selected interpreter.
+The commonplacebook plugin's index and embed-sync tools are Perl and require `DBI` and `DBD::SQLite`. Run them through the wrappers that `scripts/install-wrapper.sh` installs (`~/.local/bin/zk-search` and `~/.local/bin/embed-sync`): those run a pinned Perl (pvm's 5.42.0 by default, or `CPB_PERL`) with a private module library, so neither the project's `.perl-version` nor a Homebrew upgrade affects them. If they fail with "Can't locate DBI.pm", re-run `scripts/install-wrapper.sh`, which rebuilds the library for the pinned Perl.

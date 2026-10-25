@@ -14,7 +14,7 @@ Re-index the zk notebook and sync embeddings.
 
 2. Run embed-sync to generate embeddings for new/modified notes:
    ```bash
-   $CLAUDE_PLUGIN_ROOT/bin/embed-sync.pl --verbose
+   "${ZK_SEARCH_BIN_DIR:-$HOME/.local/bin}/embed-sync" --verbose
    ```
 
 3. Report the results to the user.

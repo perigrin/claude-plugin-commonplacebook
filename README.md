@@ -63,13 +63,15 @@ The setup script will:
 - Create the `embeddings` table in `.zk/notebook.db` if needed
 - Print a configuration snippet to add to your `.zk/config.toml`
 
-2. Install the `zk-search` wrapper to a stable location:
+2. Install the `zk-search` and `embed-sync` wrappers to a stable location:
 
 ```bash
 ~/.claude/plugins/commonplacebook/scripts/install-wrapper.sh
 ```
 
-This creates a wrapper at `~/.local/bin/zk-search` that discovers the current plugin path dynamically. Override the install location with `ZK_SEARCH_BIN_DIR` or `XDG_BIN_HOME` environment variables.
+This creates wrappers at `~/.local/bin/zk-search` and `~/.local/bin/embed-sync` that discover the current plugin path dynamically. Override the install location with `ZK_SEARCH_BIN_DIR` or `XDG_BIN_HOME` environment variables.
+
+The wrappers run a pinned Perl, not whatever `perl` is first on your `PATH`, so a Homebrew upgrade can't break them. By default that's pvm's Perl 5.42.0 (`pvm install 5.42.0`); set `CPB_PERL` to use a different one. On first run the installer builds `DBI` and `DBD::SQLite` for that Perl into a private library at `~/.local/share/commonplacebook/perl5` (override with `CPB_LIB`). This needs `cpanm` once and takes a few minutes. Re-run the installer after changing `CPB_PERL`.
 
 3. Add the aliases to your `.zk/config.toml`:
 
@@ -85,7 +87,7 @@ lucky = "$HOME/.local/bin/zk-search semantic --limit 1 --paths"
 
 ```bash
 cd ~/your-notebook
-~/.claude/plugins/commonplacebook/bin/embed-sync.pl
+~/.local/bin/embed-sync
 ```
 
 This only needs to be run once initially, then periodically when you add new notes.
