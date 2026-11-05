@@ -8,7 +8,6 @@ search = "ZK_SEARCH_BIN/zk-search semantic"
 
 # Keyword search - full-text search across note content
 keyword = "ZK_SEARCH_BIN/zk-search keyword"
-ksearch = "ZK_SEARCH_BIN/zk-search keyword"
 
 # Related notes - find similar notes to a given file
 related = "ZK_SEARCH_BIN/zk-search similar"

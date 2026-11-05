@@ -33,13 +33,13 @@ zk search "how to structure MCP servers"
 Fast exact-match search using FTS5:
 
 ```bash
-zk ksearch "exact term"
+zk keyword "exact term"
 ```
 
 Example:
 ```bash
-zk ksearch "Test::More"
-zk ksearch "Mojolicious"
+zk keyword "Test::More"
+zk keyword "Mojolicious"
 ```
 
 ### Find Related Notes
